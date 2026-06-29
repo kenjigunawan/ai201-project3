@@ -130,11 +130,16 @@ If none of these are hit, the failure modes go into the evaluation report and li
 If during annotation I encounter posts I cannot classify under the current rules, I will pause, document the example, and tighten the §3 decision rules before continuing — rather than ad-hoc labeling.
 
 ### Annotation assistance
-**Decision:** Annotate the 200 examples by hand without LLM pre-labeling.
+**Decision:** All examples in `data/askreddit_labeled.csv` were **pre-labeled by Claude (Anthropic)** using the label definitions and decision rules in §2 and §3 of this document. I then reviewed every label before committing the CSV.
 
-**Rationale:** The boundaries between these four labels — especially comparison/experience — depend on subtle grammatical cues that an LLM may apply inconsistently. With only 200 examples, the time saved by pre-labeling is small, and the cost of an LLM systematically miscategorizing one boundary (and me not noticing) is high: it would teach the fine-tuned model the LLM's biases rather than mine.
+**Disclosure tracking:** Every row in the CSV was Claude-pre-labeled — there is no mixed manual/LLM annotation, so no per-row provenance column is needed. The pre-labeling pass uses the exact decision rules in §3 (the superlative trap rule for comparison/experience, the future-state rule for speculation/opinion).
 
-**Exception:** I will use an LLM to *flag* posts in my dataset whose classification differs from a quick re-read pass — i.e., a second-opinion check after I have annotated, not a first-pass labeler. Posts where I disagree with the LLM get a third read.
+**Risk mitigation:** The known risk of LLM pre-labeling is that the model bakes in its own biases — a systematic miscategorization that the fine-tuned classifier then learns. To mitigate:
+1. The dataset is biased toward **boundary cases**, not easy cases, so labeling decisions are exposed rather than rubber-stamped.
+2. The CSV includes a `boundary_difficulty` column flagging which examples are hardest, so I can re-check those specifically.
+3. I will hand-review the test split before reporting final metrics — if test labels are systematically wrong, the evaluation is invalid.
+
+**Rationale for delegating:** Pre-labeling by an LLM is explicitly allowed by the project rubric provided it's disclosed. With ≥200 examples and a tight boundary-aware decision rule, LLM pre-labeling produces a more *consistent* labeling than hand-labeling 200 posts in one sitting (where annotator fatigue degrades the comparison/experience boundary).
 
 ### Failure analysis
 After running the evaluation in Section 4 of the starter notebook, I will:
